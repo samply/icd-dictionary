@@ -52,14 +52,17 @@ java -jar fhir-claml-0.0.1-SNAPSHOT.jar
     -valueset http://hl7.org/fhir/sid/icd-10-gm/vs
 ```
 
-4.) Run the ICD-10 dictonary (as executable jar) and load the data by using the endpoint "/api/v1/icd/load" with the file path to the FHIR .json-file as body - e.g.
+4.) Run the ICD-10 dictonary (as executable jar) and load the data by using the endpoint "/api/v1/icd/load" with the FHIR .json-file as body (content type=JSON) - e.g.
 ```
 http://localhost:8080/api/v1/icd/load
-
-C:\Users\xyz\icd-service\codesystem-icd10gm-2020.json
 ```
+The supported FHIR-Resource representing the ICD-10 codes is CodeSystem (R4).
 
 ## Docker
+Start with maven install
+```
+mvn install
+```
 For building the docker container use
 ```
 docker build -t icd-dictonary .
@@ -68,7 +71,7 @@ The command for starting the container is something like
 ```
 docker run -rm -e "ICD_DB_HOST=192.168.170.10" -p 8080:8080 -t icd-dictonary
 ```
-
+where the IP address represents the host of the postgres database.
 ## License
 
  Copyright 2020 The Samply Development Community

@@ -7,11 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,18 +21,11 @@ public class LoadIcdCodeService {
         this.icdCodeDao = icdCodeDao;
     }
 
-    public int load(String filePath) {
+    public int load(CodeSystem codeSystem) {
         if (this.icdCodeDao.count() > 0) {
-            return -2;
-        }
-
-        Jsonb jsonb = JsonbBuilder.create();
-        CodeSystem codeSystem;
-        try {
-            codeSystem = jsonb.fromJson(new FileInputStream(filePath), CodeSystem.class);
-        } catch (FileNotFoundException e) {
             return -1;
         }
+
         creaeIcdCodes(codeSystem);
         return 0;
     }

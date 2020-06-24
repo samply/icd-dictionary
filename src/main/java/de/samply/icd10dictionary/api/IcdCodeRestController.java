@@ -1,6 +1,7 @@
 package de.samply.icd10dictionary.api;
 
 import de.samply.icd10dictionary.model.IcdCode;
+import de.samply.icd10dictionary.service.CodeSystem;
 import de.samply.icd10dictionary.service.LoadIcdCodeService;
 import de.samply.icd10dictionary.service.SearchIcdCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,8 @@ public class IcdCodeRestController {
     }
 
     @PostMapping("load")
-    public void loadFromFile(@RequestBody String filePath) {
-        this.loadIcdCodeService.load(filePath);
+    public void load(@RequestBody CodeSystem codeSystem) {
+        this.loadIcdCodeService.load(codeSystem);
     }
 
     @GetMapping
