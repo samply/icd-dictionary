@@ -3,7 +3,7 @@ The main purpose of this dictonary is to find list of ICD-10 codes by searching 
 
 A list of ICD-10 codes can be retrieved by using the endpoint "/api/v1/icd" with queryparameter "searchword" - e.g.
 ```
-http://localhost:8080/api/v1/icd?searchword=infektiös
+http://localhost:8080/fhir/ValueSet/$expand?url=http://hl7.org/fhir/sid/icd-10-gm&filter=infektiös
 ```
 
 ## Default parameters
@@ -22,11 +22,12 @@ http://localhost:8080/api/v1/icd?searchword=infektiös
 
 For testing purposes one can start a postgres database with Docker using following comand:
 ```
-docker run --name icd-postgres -d -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:alpine
+docker network create -d bridge icd-net
+docker run --name icd-postgres -d --network=icd-net -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:alpine
 ```
 Then create a database by executing a bash and using PSQL
 ```
-docker exec -it demo-postgres bin/bash
+docker exec -it icd-postgres bin/bash
 psql -U postgres
 CREATE DATABASE icd10;
 ```
@@ -36,8 +37,9 @@ CREATE DATABASE icd10;
 To run the ICD-10 dictionary service the ICD-10 data must be present as a FHIR code system. For the ICD10-GM this can be achieve in following steps:
 
 0.) Start a postgres database on port 5432 
-1.) Download ClaML-file
-https://www.dimdi.de/dynamic/de/klassifikationen/icd/
+
+1.) Download ClaML-file (ICD-10-GM)
+https://www.dimdi.de/dynamic/de/klassifikationen/downloads/
 
 2.) Clone the repository https://github.com/aehrc/fhir-claml and maven install the .jar-file
 
@@ -66,7 +68,7 @@ docker build -t icd-dictonary .
 ```
 The command for starting the container is something like
 ```
-docker run -rm -e "ICD_DB_HOST=192.168.170.10" -p 8080:8080 -t icd-dictonary
+docker run --rm -d -e "ICD_DB_HOST=icd-postgres" -p 8080:8080 --network=icd-net --name icd-dictionary -t icd-dictionary
 ```
 
 ## License
