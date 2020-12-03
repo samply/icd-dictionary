@@ -7,17 +7,17 @@ import java.util.Optional;
 
 public interface IcdCodeDao {
 
-    int insert(IcdCode icdCode);
+  int insert(IcdCode icdCode);
 
-    Optional<IcdCode> selectIcdCodeByCode(String codeParam);
+  Optional<IcdCode> selectIcdCodeByCode(String codeParam);
 
-    int deleteByCode(String code);
+  int deleteByCode(String code);
 
-    List<IcdCode> retrieveAll();
+  List<IcdCode> retrieveAll();
 
-    int deleteAll();
+  int deleteAll();
 
-    int count();
+  int count();
 
-    List<IcdCode> retrieveCodesBySearchword(String searchword);
+  List<IcdCode> retrieveCodesBySearchword(String searchword);
 }

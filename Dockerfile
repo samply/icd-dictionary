@@ -1,7 +1,7 @@
 FROM openjdk:14-ea-alpine
 
 ENV SPRING_PROFILES_ACTIVE=docker
-ARG JAR_FILE=target/*.jar
+ARG JAR_FILE=target/icd10-dictionary.jar
 
 ENV ICD_DB_HOST=localhost
 ENV ICD_DB_PORT=5432
