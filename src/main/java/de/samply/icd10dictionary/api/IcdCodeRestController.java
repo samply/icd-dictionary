@@ -47,11 +47,11 @@ public class IcdCodeRestController {
    */
   @GetMapping("fhir/ValueSet/$expand")
   public ValueSet retrieveCodesBySearchword(@RequestParam String url, @RequestParam String filter) {
-    if (!StringUtils.endsWithIgnoreCase(url, URL_ICD_10_GM)) {
+    if (!StringUtils.equalsIgnoreCase(url, URL_ICD_10_GM)) {
       return new ValueSet();
     }
 
-    String searchword = StringUtils.trim(filter).replaceAll(" ", "");
+    String searchword = StringUtils.trim(filter).replaceAll("\\s+","");
     List<IcdCode> icdCodes = this.searchIcdCodeService.retrieveCodesBySearchword(searchword);
 
     return createValueSet(icdCodes);
