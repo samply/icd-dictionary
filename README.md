@@ -1,5 +1,5 @@
 ## Purpose
-The main purpose of this dictonary is to find list of ICD-10 codes by searching for words.
+The main purpose of this dictionary is to find list of ICD-10 codes by searching for words.
 
 A list of ICD-10 codes can be retrieved by using the endpoint "/api/v1/icd" with queryparameter "searchword" - e.g.
 ```
@@ -54,7 +54,7 @@ java -jar fhir-claml-0.0.1-SNAPSHOT.jar
     -valueset http://hl7.org/fhir/sid/icd-10-gm/vs
 ```
 
-4.) Run the ICD-10 dictonary (as executable jar) and load the data by using the endpoint "/api/v1/icd/load" with the file path to the FHIR .json-file as body - e.g.
+4.) Run the ICD-10 dictionary (as executable jar) and load the data by using the endpoint "/api/v1/icd/load" with the file path to the FHIR .json-file as body - e.g.
 ```
 http://localhost:8080/api/v1/icd/load
 
@@ -64,12 +64,15 @@ C:\Users\xyz\icd-service\codesystem-icd10gm-2020.json
 ## Docker
 For building the docker container use
 ```
-docker build -t icd-dictonary .
+docker build -t icd-dictionary .
 ```
 The command for starting the container is something like
 ```
 docker run --rm -d -e "ICD_DB_HOST=icd-postgres" -p 8080:8080 --network=icd-net --name icd-dictionary -t icd-dictionary
 ```
+
+## Developers
+This project uses lombok. Though it is not neccessary it is recomended to install a suitable lombok plugin for your IDE (e.g. for IntelliJ Idea install https://plugins.jetbrains.com/plugin/6317-lombok).
 
 ## License
 

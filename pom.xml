@@ -15,7 +15,6 @@
     <name>icd10-dictionary</name>
     <description>REST Service for ICD10 lookups</description>
 
-
     <properties>
         <java.version>11</java.version>
     </properties>
