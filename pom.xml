@@ -14,6 +14,23 @@
 
     <name>icd10-dictionary</name>
     <description>REST Service for ICD10 lookups</description>
+    <url>https://github.com/samply/maven-parent/icd10-dictionary</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Bjoern Kroll</name>
+            <email>Bjoern.Kroll@uni-luebeck.de</email>
+            <organization>University Medical Center Schleswig-Holstein</organization>
+            <organizationUrl>http://www.uksh.de/en</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <java.version>11</java.version>
