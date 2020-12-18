@@ -28,11 +28,11 @@ public class LoadIcdCodeService {
    * Reads Codesystem (CLAML) and writes codes to database.
    *
    * @param clamlContent content in CLAML format
-   * @return int code: 0 = ok, -1 = exception, -2 = database not empty
+   * @return ErrorCode
    */
-  public int load(String clamlContent) {
+  public ErrorCode load(String clamlContent) {
     if (this.icdCodeDao.count() > 0) {
-      return -2;
+      return ErrorCode.DB_NOT_EMPTY;
     }
 
     Jsonb jsonb = JsonbBuilder.create();
@@ -40,13 +40,14 @@ public class LoadIcdCodeService {
     try {
       codeSystem = jsonb.fromJson(new FileInputStream(clamlContent), CodeSystem.class);
     } catch (FileNotFoundException e) {
-      return -1;
+      return ErrorCode.FILE_NOT_FOUND;
     }
-    creaeIcdCodes(codeSystem);
-    return 0;
+
+    createIcdCodes(codeSystem);
+    return ErrorCode.OK;
   }
 
-  private void creaeIcdCodes(CodeSystem codeSystem) {
+  private void createIcdCodes(CodeSystem codeSystem) {
     codeSystem.getConcept().forEach(concept -> this.icdCodeDao.insert(createIcdCode(concept)));
   }
 
@@ -85,5 +86,12 @@ public class LoadIcdCodeService {
     } else {
       return parentPropertyMayBe.get().getValueCode();
     }
+  }
+
+  public enum ErrorCode {
+    OK,
+    FILE_NOT_FOUND,
+    DB_NOT_EMPTY,
+    OTHER;
   }
 }
