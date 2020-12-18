@@ -47,7 +47,7 @@ public class IcdCodeRestController {
         case OK:
           break;
         case FILE_NOT_FOUND:
-          return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+          return new ResponseEntity<>("File not found", HttpStatus.BAD_REQUEST);
         case DB_NOT_EMPTY:
           return new ResponseEntity<>("Database not empty", HttpStatus.CONFLICT);
         case OTHER:
@@ -55,7 +55,7 @@ public class IcdCodeRestController {
           return new ResponseEntity<>("Unspecified error", HttpStatus.BAD_REQUEST);
       }
     } catch (Exception e) {
-      return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     return new ResponseEntity<>("File imported", HttpStatus.OK);
