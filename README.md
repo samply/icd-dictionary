@@ -1,3 +1,5 @@
+**The project is a temporary solution until a FHIR terminology is available.**
+
 ## Purpose
 The main purpose of this dictionary is to find list of ICD-10 codes by searching for words.
 
