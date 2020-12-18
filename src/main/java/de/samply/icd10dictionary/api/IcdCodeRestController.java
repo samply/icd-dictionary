@@ -36,6 +36,7 @@ public class IcdCodeRestController {
 
   /**
    * Loads ICD-10 catalog from specified location 'clamlFileUri' on server.
+   *
    * @param clamlFileUri Location of content file
    * @return ResponseEntity Http status
    */

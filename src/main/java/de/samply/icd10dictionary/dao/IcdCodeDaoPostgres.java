@@ -86,7 +86,8 @@ public class IcdCodeDaoPostgres implements IcdCodeDao {
             + "FROM IcdCode "
             + "WHERE to_tsvector(definition) @@ to_tsquery(' "
             + searchword
-            + ":*')";
+            + ":*') "
+            + "AND childCodes = ''";
     return this.jdbcTemplate.query(sql, ((resultSet, i) -> createIcdCode(resultSet)));
   }
 
