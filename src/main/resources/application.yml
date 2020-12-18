@@ -1,6 +1,6 @@
 app:
   datasource:
-    jdbc-url: jdbc:postgresql://localhost:5432/icd10
+    jdbc-url: jdbc:postgresql://localhost:5432/icd10?currentSchema=samply
     username: postgres
     password: password
     pool-size: 30
