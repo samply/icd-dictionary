@@ -60,6 +60,10 @@ http://localhost:8080/api/v1/icd/load
 
 C:\Users\xyz\icd-service\codesystem-icd10gm-2020.json
 ```
+Remark: When working with Docker the file must be copied to a suitable location inside the container
+```
+docker cp C:\Users\xyz\icd-service\codesystem-icd10gm-2020.json [CONTAINER-ID]:/var/tmp/icd10
+```
 
 ## Docker
 For building the docker container use
@@ -68,7 +72,7 @@ docker build -t icd-dictionary .
 ```
 The command for starting the container is something like
 ```
-docker run --rm -d -e "ICD_DB_HOST=icd-postgres" -p 8080:8080 --network=icd-net --name icd-dictionary -t icd-dictionary
+docker run --rm -d -e "ICD_DB_HOST=icd-postgres" -p 8080:8080 --network=icd-net --name icd-dictionary icd-dictionary
 ```
 
 ## Developers

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,9 +34,31 @@ public class IcdCodeRestController {
     this.searchIcdCodeService = searchIcdCodeService;
   }
 
+  /**
+   * Loads ICD-10 catalog from specified location 'clamlFileUri' on server.
+   * @param clamlFileUri Location of content file
+   * @return ResponseEntity Http status
+   */
   @PostMapping("api/v1/icd/load")
-  public void loadFromFile(@RequestBody String clamlContent) {
-    this.loadIcdCodeService.load(clamlContent);
+  public ResponseEntity<String> loadFromFile(@RequestBody String clamlFileUri) {
+    try {
+      LoadIcdCodeService.ErrorCode errorCode = this.loadIcdCodeService.load(clamlFileUri);
+      switch (errorCode) {
+        case OK:
+          break;
+        case FILE_NOT_FOUND:
+          return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+        case DB_NOT_EMPTY:
+          return new ResponseEntity<>("Database not empty", HttpStatus.CONFLICT);
+        case OTHER:
+        default:
+          return new ResponseEntity<>("Unspecified error", HttpStatus.BAD_REQUEST);
+      }
+    } catch (Exception e) {
+      return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    return new ResponseEntity<>("File imported", HttpStatus.OK);
   }
 
   /**
@@ -51,7 +75,7 @@ public class IcdCodeRestController {
       return new ValueSet();
     }
 
-    String searchword = StringUtils.trim(filter).replaceAll("\\s+","");
+    String searchword = StringUtils.trim(filter).replaceAll("\\s+", "");
     List<IcdCode> icdCodes = this.searchIcdCodeService.retrieveCodesBySearchword(searchword);
 
     return createValueSet(icdCodes);
