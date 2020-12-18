@@ -17,7 +17,7 @@ public class SearchIcdCodeService {
     this.icdCodeDao = icdCodeDao;
   }
 
-  public List<IcdCode> retrieveCodesBySearchword(String searchword) {
-    return this.icdCodeDao.retrieveCodesBySearchword(searchword);
+  public List<IcdCode> retrieveCodesByQueryText(String queryText) {
+    return this.icdCodeDao.retrieveCodesByQueryText(queryText);
   }
 }

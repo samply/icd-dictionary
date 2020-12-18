@@ -76,18 +76,23 @@ public class IcdCodeDaoPostgres implements IcdCodeDao {
   }
 
   @Override
-  public List<IcdCode> retrieveCodesBySearchword(String searchword) {
-    if (StringUtils.isBlank(searchword)) {
+  public List<IcdCode> retrieveCodesByQueryText(String queryText) {
+    if (StringUtils.isBlank(queryText)) {
       return new ArrayList<>();
     }
 
     final String sql =
         "SELECT code, kind, display, definition, parentCode, childCodes "
             + "FROM IcdCode "
-            + "WHERE to_tsvector(definition) @@ to_tsquery(' "
-            + searchword
-            + ":*') "
-            + "AND childCodes = ''";
+            + "WHERE childCodes = '' "
+            + "AND to_tsvector('german', definition) @@ "
+            + "  array_to_string("
+            + "    array(select unnest || ':*' "
+            + "      from unnest("
+            + "        regexp_split_to_array(plainto_tsquery('german', '" + queryText +"')::text, '\\s&\\s')"
+            + "      )"
+            + "    ), ' & '"
+            + "  )::tsquery";
     return this.jdbcTemplate.query(sql, ((resultSet, i) -> createIcdCode(resultSet)));
   }
 

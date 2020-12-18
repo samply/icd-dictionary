@@ -19,5 +19,5 @@ public interface IcdCodeDao {
 
   int count();
 
-  List<IcdCode> retrieveCodesBySearchword(String searchword);
+  List<IcdCode> retrieveCodesByQueryText(String queryText);
 }
