@@ -71,13 +71,12 @@ public class IcdCodeRestController {
    * @return ValueSet containing all filtered codes
    */
   @GetMapping("fhir/ValueSet/$expand")
-  public ValueSet retrieveCodesBySearchword(@RequestParam String url, @RequestParam String filter) {
+  public ValueSet expand(@RequestParam String url, @RequestParam String filter) {
     if (!StringUtils.equalsIgnoreCase(url, URL_ICD_10_GM)) {
       return new ValueSet();
     }
 
-    String searchword = StringUtils.trim(filter).replaceAll("\\s+", "");
-    List<IcdCode> icdCodes = this.searchIcdCodeService.retrieveCodesBySearchword(searchword);
+    List<IcdCode> icdCodes = this.searchIcdCodeService.retrieveCodesByQueryText(filter);
 
     return createValueSet(icdCodes);
   }
