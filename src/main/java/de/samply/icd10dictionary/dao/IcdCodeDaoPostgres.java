@@ -89,7 +89,8 @@ public class IcdCodeDaoPostgres implements IcdCodeDao {
             + "  array_to_string("
             + "    array(select unnest || ':*' "
             + "      from unnest("
-            + "        regexp_split_to_array(plainto_tsquery('german', '" + queryText +"')::text, '\\s&\\s')"
+            + "        regexp_split_to_array(plainto_tsquery('german', '" + queryText + "')::text, "
+            + "          '\\s&\\s')"
             + "      )"
             + "    ), ' & '"
             + "  )::tsquery";
