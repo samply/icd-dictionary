@@ -75,9 +75,7 @@ public class IcdCodeRestController {
     if (!StringUtils.equalsIgnoreCase(url, URL_ICD_10_GM)) {
       return new ValueSet();
     }
-
     List<IcdCode> icdCodes = this.searchIcdCodeService.retrieveCodesByQueryText(filter);
-
     return createValueSet(icdCodes);
   }
 

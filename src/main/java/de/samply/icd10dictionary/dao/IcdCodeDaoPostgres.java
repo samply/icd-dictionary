@@ -84,8 +84,9 @@ public class IcdCodeDaoPostgres implements IcdCodeDao {
     final String sql =
         "SELECT code, kind, display, definition, parentCode, childCodes "
             + "FROM IcdCode "
-            + "WHERE childCodes = '' "
-            + "AND to_tsvector('german', definition) @@ "
+            + "WHERE childCodes = ''"
+            + "AND (code like ?"
+            + "OR to_tsvector('german', definition) @@ "
             + "  array_to_string("
             + "    array(select unnest || ':*' "
             + "      from unnest("
@@ -93,8 +94,9 @@ public class IcdCodeDaoPostgres implements IcdCodeDao {
             + "          '\\s&\\s')"
             + "      )"
             + "    ), ' & '"
-            + "  )::tsquery";
-    return this.jdbcTemplate.query(sql, ((resultSet, i) -> createIcdCode(resultSet)));
+            + "  )::tsquery)";
+    return this.jdbcTemplate.query(sql, new String[]{"%" + queryText + "%"}, new int[]{1},
+        ((resultSet, i) -> createIcdCode(resultSet)));
   }
 
   @Override
