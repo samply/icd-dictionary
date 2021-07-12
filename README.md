@@ -100,7 +100,7 @@ Run the following in the command line console:
 cd ICD10-GM
 sh fhir-claml.sh <Name of downloaded ZIP file>
 ```
-It will take a few minutes. When it is ready, you should find a new file in the folder: "codesystem-icd10gm.json". This file contains the directory data that you will need for importing in the next step.
+It will take a few minutes. When it is ready, you should find a new file in the folder: "codesystem-icd10gm.json". This file contains the dictionary data that you will need for importing in the next step.
 
 ### Start icd-dictionary
 
@@ -124,6 +124,7 @@ docker cp codesystem-icd10gm.json $CTR:/var/tmp/icd10/codesystem-icd10gm.json
 winpty docker exec -it $CTR bash
 # You are now in the container
 curl -H 'Content-Type:text/plain' -d '/var/tmp/icd10/codesystem-icd10gm.json' http://localhost:8080/api/v1/icd/load
+rm /var/tmp/icd10/codesystem-icd10gm.json
 # The following command is a test to make sure that there is content
 curl 'http://localhost:8080/icd10/ValueSet/$expand?url=http://hl7.org/fhir/sid/icd-10-gm&filter=blut'
 exit
