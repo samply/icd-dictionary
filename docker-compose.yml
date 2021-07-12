@@ -1,0 +1,34 @@
+version: '3.4'
+services:
+  icd-postgres:
+    container_name: "icd-postgres"
+    image: "postgres:alpine"
+    environment:
+      POSTGRES_USER: "icd10"
+      POSTGRES_PASSWORD: "icd10"
+      POSTGRES_DB: "icd10"
+    networks:
+      - "icd-net"
+    volumes:
+      - "icd-postgres-data:/var/lib/postgresql/data"
+    restart: "always"
+  icd-dictionary:
+    container_name: "icd-dictionary"
+    image: "icd-dictionary"
+    environment:
+      ICD_DB_HOST: "icd-postgres"
+      ICD_DB_USER: "icd10"
+      ICD_DB_PASSWORD: "icd10"
+      ICD_DB_NAME: "icd10"
+    networks:
+      - "icd-net"
+    ports:
+      - "8080:8080"
+
+networks:
+  icd-net:
+    driver: "bridge"
+
+volumes:
+  icd-postgres-data:
+    name: "icd-postgres-data"
