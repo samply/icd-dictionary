@@ -119,14 +119,14 @@ You will need to execute the following steps. They involve copying the data to t
 ```
 CTR=`docker ps | grep icd-dictionary | awk '{print $1}'`
 
-docker cp codesystem-icd10gm.json $CTR:/var/tmp/icd10/codesystem-icd10gm.json
+docker cp ICD10-GM/codesystem-icd10gm.json $CTR:/var/tmp/icd10/codesystem-icd10gm.json
 
 winpty docker exec -it $CTR bash
 # You are now in the container
 curl -H 'Content-Type:text/plain' -d '/var/tmp/icd10/codesystem-icd10gm.json' http://localhost:8080/api/v1/icd/load
 rm /var/tmp/icd10/codesystem-icd10gm.json
 # The following command is a test to make sure that there is content
-curl 'http://localhost:8080/icd10/ValueSet/$expand?url=http://hl7.org/fhir/sid/icd-10-gm&filter=blut'
+curl 'http://localhost:8080/fhir/ValueSet/$expand?url=http://hl7.org/fhir/sid/icd-10-gm&filter=blut'
 exit
 
 ```
