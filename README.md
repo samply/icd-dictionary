@@ -82,6 +82,56 @@ docker run --rm -d -e "ICD_DB_HOST=icd-postgres" -p 8080:8080 --network=icd-net 
 
 This project uses lombok. Though it is not neccessary it is recomended to install a suitable lombok plugin for your IDE (e.g. for IntelliJ Idea install https://plugins.jetbrains.com/plugin/6317-lombok).
 
+## Example usage
+
+In this section, you will see how to do the following:
+
+- Generate the dictionary data.
+- Start the icd-dictionary using docker-compose
+- Import the dictionary data into a running icd-dictionary.
+
+### Generate dictionary data
+
+First visit the [BMBF website hosting the data](https://www.dimdi.de/dynamic/.downloads/klassifikationen/icd-10-gm/version2021/icd10gm2021syst-claml-20201111.zip). Scroll to the bottom of the page, click on the checkbox "Ich habe die Downloadbedingungen gelesen und stimme diesen ausdrücklich zu", then click the button "Senden". Save the ZIP file in the folder "ICD10-GM".
+
+Run the following in the command line console:
+
+```
+cd ICD10-GM
+sh fhir-claml.sh <Name of downloaded ZIP file>
+```
+It will take a few minutes. When it is ready, you should find a new file in the folder: "codesystem-icd10gm.json". This file contains the directory data that you will need for importing in the next step.
+
+### Start icd-dictionary
+
+Go back up a level in the folder hierarchy and start icd-dictionary:
+
+```
+cd ..
+docker build -t icd-dictionary .
+docker-compose up -d
+```
+
+### Import dictionary data
+
+You will need to execute the following steps. They involve copying the data to the running icd-dictionary container, opening a terminal on the container and uploading the data.
+
+```
+CTR=`docker ps | grep icd-dictionary | awk '{print $1}'`
+
+docker cp codesystem-icd10gm.json $CTR:/var/tmp/icd10/codesystem-icd10gm.json
+
+winpty docker exec -it $CTR bash
+# You are now in the container
+curl -H 'Content-Type:text/plain' -d '/var/tmp/icd10/codesystem-icd10gm.json' http://localhost:8080/api/v1/icd/load
+# The following command is a test to make sure that there is content
+curl 'http://localhost:8080/icd10/ValueSet/$expand?url=http://hl7.org/fhir/sid/icd-10-gm&filter=blut'
+exit
+
+```
+
+Note that you only need to use "winpty" if you are using git bash on Windows. Otherwise, you can use vanilla docker.
+
 ## License
 
 Copyright 2020 The Samply Development Community
