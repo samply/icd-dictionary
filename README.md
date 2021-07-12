@@ -140,7 +140,7 @@ docker exec -it $CTR bash
 curl -H 'Content-Type:text/plain' -d '/var/tmp/icd10/codesystem-icd10.json' http://localhost:8080/api/v1/icd/load
 rm /var/tmp/icd10/codesystem-icd10.json
 # The following command is a test to make sure that there is content
-curl 'http://localhost:8080/icd10/ValueSet/$expand?url=http://hl7.org/fhir/sid/icd-10-gm&filter=blut'
+curl 'http://localhost:8080/fhir/ValueSet/$expand?url=http://hl7.org/fhir/sid/icd-10-gm&filter=blut'
 exit
 
 ```
