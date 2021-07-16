@@ -26,7 +26,6 @@ RUN apk update
 RUN apk upgrade
 RUN apk add bash
 RUN apk add gettext
-RUN apk add curl
 
 COPY ./docker/start.sh .
 RUN chmod +x ./start.sh
