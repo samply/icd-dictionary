@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>icd10-dictionary</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.0</version>
 
     <name>icd10-dictionary</name>
     <description>REST Service for ICD10 lookups</description>
