@@ -85,7 +85,7 @@ public class IcdCodeDaoPostgres implements IcdCodeDao {
         "SELECT code, kind, display, definition, parentCode, childCodes "
             + "FROM IcdCode "
             + "WHERE childCodes = ''"
-            + "AND (code like ?"
+            + "AND (LOWER(code) like LOWER(?)"
             + "OR to_tsvector('german', definition) @@ "
             + "  array_to_string("
             + "    array(select unnest || ':*' "
