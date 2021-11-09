@@ -92,19 +92,33 @@ In this section, you will see how to do the following:
 
 ### Generate dictionary data
 
-First visit the [BMBF website hosting the data](https://www.dimdi.de/dynamic/.downloads/klassifikationen/icd-10-gm/version2021/icd10gm2021syst-claml-20201111.zip). Scroll to the bottom of the page, click on the checkbox "Ich habe die Downloadbedingungen gelesen und stimme diesen ausdrücklich zu", then click the button "Senden". Save the ZIP file in the folder "ICD10-GM".
+First visit the [BMBF website hosting the data](https://www.dimdi.de/dynamic/de/downloads/).
+
+Scroll down to the choosers. Click on the one labelled "ICD-10-GM" for the German language dictionary, or the one labelled "ICD-10-WHO" for the English language dictionary.
+
+Pick the most recent version.
+
+You will see a list of files to the right of the choosers. Click on the ClaML/XML file.
+
+You will be brought to a new page. Scroll to the bottom, click on the checkbox "Ich habe die Downloadbedingungen gelesen und stimme diesen ausdrücklich zu", then click the button "Senden". Change the name of the ZIP file to "codesystem-icd10.zip" and save it in the folder "ICD10-GM".
 
 Run the following in the command line console:
 
 ```
 cd ICD10-GM
-sh fhir-claml.sh <Name of downloaded ZIP file>
+sh fhir-claml.sh codesystem-icd10.zip > codesystem-icd10.json
 ```
-It will take a few minutes. When it is ready, you should find a new file in the folder: "codesystem-icd10gm.json". This file contains the dictionary data that you will need for importing in the next step.
+It will take a few minutes. When it is ready, you should find a new file in the folder: "codesystem-icd10.json". This file contains the dictionary data that you will need for importing in the next step.
 
 ### Start icd-dictionary
 
-Go back up a level in the folder hierarchy and start icd-dictionary:
+If this is not the first time that you have loaded data to the ICD10 chooser, you will need to wipe the database clean:
+
+```
+docker volume rm icd-postgres-data
+```
+
+Now go back up a level in the folder hierarchy and start icd-dictionary:
 
 ```
 cd ..
@@ -119,19 +133,19 @@ You will need to execute the following steps. They involve copying the data to t
 ```
 CTR=`docker ps | grep icd-dictionary | awk '{print $1}'`
 
-docker cp codesystem-icd10gm.json $CTR:/var/tmp/icd10/codesystem-icd10gm.json
+docker cp ICD10-GM/codesystem-icd10.json $CTR:/var/tmp/icd10/codesystem-icd10.json
 
-winpty docker exec -it $CTR bash
+docker exec -it $CTR bash
 # You are now in the container
-curl -H 'Content-Type:text/plain' -d '/var/tmp/icd10/codesystem-icd10gm.json' http://localhost:8080/api/v1/icd/load
-rm /var/tmp/icd10/codesystem-icd10gm.json
+curl -H 'Content-Type:text/plain' -d '/var/tmp/icd10/codesystem-icd10.json' http://localhost:8080/api/v1/icd/load
+rm /var/tmp/icd10/codesystem-icd10.json
 # The following command is a test to make sure that there is content
 curl 'http://localhost:8080/icd10/ValueSet/$expand?url=http://hl7.org/fhir/sid/icd-10-gm&filter=blut'
 exit
 
 ```
 
-Note that you only need to use "winpty" if you are using git bash on Windows. Otherwise, you can use vanilla docker.
+Note that you will need to precede the "docker exec" with "winpty" if you are using git bash on Windows.
 
 ## License
 

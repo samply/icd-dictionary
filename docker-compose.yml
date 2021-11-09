@@ -14,7 +14,8 @@ services:
     restart: "always"
   icd-dictionary:
     container_name: "icd-dictionary"
-    image: "icd-dictionary"
+    #image: "icd-dictionary"
+    image: "samply/icd-dictionary:0.3.1"
     environment:
       ICD_DB_HOST: "icd-postgres"
       ICD_DB_USER: "icd10"
@@ -23,7 +24,8 @@ services:
     networks:
       - "icd-net"
     ports:
-      - "8080:8080"
+      - "8081:8080"
+    restart: "always"
 
 networks:
   icd-net:
