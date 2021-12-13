@@ -35,7 +35,7 @@ public class IcdCodeRestController {
   }
 
   @GetMapping("/health")
-  public ResponseEntity<String> check(){
+  public ResponseEntity<String> check() {
     return new ResponseEntity<>("System running", HttpStatus.OK);
   }
 
@@ -68,10 +68,9 @@ public class IcdCodeRestController {
   }
 
   /**
-   * Implements (partially) the $expand operator - see
-   * https://www.hl7.org/fhir/operation-valueset-expand.html
+   * Implements (partially) the $expand operator - see https://www.hl7.org/fhir/operation-valueset-expand.html
    *
-   * @param url for the ICD-10-GM codesystem (must be 'http://hl7.org/fhir/sid/icd-10-gm')
+   * @param url    for the ICD-10-GM codesystem (must be 'http://hl7.org/fhir/sid/icd-10-gm')
    * @param filter term to search in display entries
    * @return ValueSet containing all filtered codes
    */
