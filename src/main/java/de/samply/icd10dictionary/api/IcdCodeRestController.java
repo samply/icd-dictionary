@@ -34,6 +34,11 @@ public class IcdCodeRestController {
     this.searchIcdCodeService = searchIcdCodeService;
   }
 
+  @GetMapping("/health")
+  public ResponseEntity<String> check(){
+    return new ResponseEntity<>("System running", HttpStatus.OK);
+  }
+
   /**
    * Loads ICD-10 catalog from specified location 'clamlFileUri' on server.
    *
