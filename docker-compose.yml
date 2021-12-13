@@ -1,0 +1,22 @@
+version: '3.2'
+services:
+  postgres:
+    image: "postgres"
+    environment:
+      POSTGRES_DB: icd10
+      POSTGRES_USER: icd10
+      POSTGRES_PASSWORD: icd10
+    volumes:
+      - "data:/var/lib/postgresql/data"
+
+  icd-dictionary:
+    build: .
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/icd10"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  data:

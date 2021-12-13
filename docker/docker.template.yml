@@ -1,6 +1,0 @@
-app:
-  datasource:
-    jdbc-url: jdbc:postgresql://${ICD_DB_HOST}:${ICD_DB_PORT}/${ICD_DB_NAME}?currentSchema=samply
-    username: ${ICD_DB_USER}
-    password: ${ICD_DB_PASSWORD}
-    pool-size: ${ICD_POOL_SIZE}

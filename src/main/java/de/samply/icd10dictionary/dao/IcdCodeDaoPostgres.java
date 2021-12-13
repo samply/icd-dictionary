@@ -3,85 +3,76 @@ package de.samply.icd10dictionary.dao;
 import de.samply.icd10dictionary.model.IcdCode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-
-@SuppressWarnings({"SqlDialectInspection", "SqlNoDataSourceInspection"})
-@Repository("postgres")
+/**
+ * Postgres implementation.
+ */
+@Repository
 public class IcdCodeDaoPostgres implements IcdCodeDao {
 
   private final JdbcTemplate jdbcTemplate;
 
-  @Autowired
   public IcdCodeDaoPostgres(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
   }
 
   @Override
-  public int insert(IcdCode icdCode) {
-    final String sql =
-        "INSERT INTO IcdCode (code, kind, display, definition, parentCode, childCodes) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+  public void insert(IcdCode icdCode) {
     this.jdbcTemplate.update(
-        sql,
-        icdCode.getCode(),
-        icdCode.getKind(),
-        icdCode.getDisplay(),
-        icdCode.getDefinition(),
-        icdCode.getParentCode(),
-        icdCode.getChildCodes());
-    return 0;
+        "INSERT INTO IcdCode (code, kind, display, definition, parentCode, childCodes) "
+            + "VALUES (?, ?, ?, ?, ?, ?)",
+        icdCode.code(),
+        icdCode.kind(),
+        icdCode.display(),
+        icdCode.definition(),
+        icdCode.parentCode(),
+        icdCode.childCodes());
   }
 
   @Override
   public Optional<IcdCode> selectIcdCodeByCode(String codeParam) {
-    final String sql =
-        "SELECT code, kind, display, definition, parentCode, childCodes "
-            + "FROM IcdCode "
-            + "WHERE code = ?";
     IcdCode icdCode =
         this.jdbcTemplate.queryForObject(
-            sql,
-            new Object[] {codeParam},
-            new int[] {1},
+            "SELECT code, kind, display, definition, parentCode, childCodes "
+                + "FROM IcdCode "
+                + "WHERE code = ?",
+            new Object[]{codeParam},
+            new int[]{1},
             ((resultSet, i) -> createIcdCode(resultSet)));
     return Optional.ofNullable(icdCode);
   }
 
   @Override
   public int deleteByCode(String code) {
-    final String sql = "DELETE FROM IcdCode WHERE id = ?";
-    this.jdbcTemplate.update(sql, code);
+    this.jdbcTemplate.update("DELETE FROM IcdCode WHERE id = ?", code);
     return 0;
   }
 
   @Override
   public int deleteAll() {
-    final String sql = "DELETE FROM IcdCode";
-    this.jdbcTemplate.update(sql);
+    this.jdbcTemplate.update("DELETE FROM IcdCode");
     return 0;
   }
 
   @Override
   public int count() {
-    final String sql = "SELECT count(*) FROM IcdCode ";
-    List<Integer> countList = this.jdbcTemplate.query(sql, (resultSet, i) -> resultSet.getInt(1));
+    List<Integer> countList = this.jdbcTemplate.query(
+        "SELECT count(*) FROM IcdCode ",
+        (resultSet, i) -> resultSet.getInt(1));
     return countList.get(0);
   }
 
   @Override
   public List<IcdCode> retrieveCodesByQueryText(String queryText) {
-    if (StringUtils.isBlank(queryText)) {
-      return new ArrayList<>();
+    if (queryText == null || queryText.isBlank()) {
+      return List.of();
     }
 
-    final String sql =
+    return this.jdbcTemplate.query(
         "SELECT code, kind, display, definition, parentCode, childCodes "
             + "FROM IcdCode "
             + "WHERE childCodes = ''"
@@ -90,20 +81,20 @@ public class IcdCodeDaoPostgres implements IcdCodeDao {
             + "  array_to_string("
             + "    array(select unnest || ':*' "
             + "      from unnest("
-            + "        regexp_split_to_array(plainto_tsquery('german', '" + queryText + "')::text, "
+            + "        regexp_split_to_array(plainto_tsquery('german', ?)::text, "
             + "          '\\s&\\s')"
             + "      )"
             + "    ), ' & '"
-            + "  )::tsquery)";
-    return this.jdbcTemplate.query(sql, new String[]{"%" + queryText + "%"}, new int[]{1},
-        ((resultSet, i) -> createIcdCode(resultSet)));
+            + "  )::tsquery)",
+        ((resultSet, i) -> createIcdCode(resultSet)),
+        "%" + queryText + "%");
   }
 
   @Override
   public List<IcdCode> retrieveAll() {
-    final String sql =
-        "SELECT code, kind, display, definition, parentCode, childCodes FROM IcdCode ";
-    return this.jdbcTemplate.query(sql, ((resultSet, i) -> createIcdCode(resultSet)));
+    return this.jdbcTemplate.query(
+        "SELECT code, kind, display, definition, parentCode, childCodes FROM IcdCode ",
+        ((resultSet, i) -> createIcdCode(resultSet)));
   }
 
   private IcdCode createIcdCode(ResultSet resultSet) throws SQLException {
