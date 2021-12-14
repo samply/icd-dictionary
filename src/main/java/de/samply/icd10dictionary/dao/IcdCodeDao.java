@@ -1,13 +1,15 @@
 package de.samply.icd10dictionary.dao;
 
 import de.samply.icd10dictionary.model.IcdCode;
-
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Main DAO.
+ */
 public interface IcdCodeDao {
 
-  int insert(IcdCode icdCode);
+  void insert(IcdCode icdCode);
 
   Optional<IcdCode> selectIcdCodeByCode(String codeParam);
 

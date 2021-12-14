@@ -3,6 +3,9 @@ package de.samply.icd10dictionary;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * Main entry point.
+ */
 @SpringBootApplication
 public class Icd10DictionaryApplication {
 

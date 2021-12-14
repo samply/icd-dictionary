@@ -1,11 +1,8 @@
 package de.samply.icd10dictionary.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+/**
+ * FHIR ValueSet.
+ */
+public record ValueSetEntry(String code, String display) {
 
-@Data
-@NoArgsConstructor
-public class ValueSetEntry {
-  private String code;
-  private String display;
 }

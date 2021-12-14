@@ -1,16 +1,14 @@
 package de.samply.icd10dictionary.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+/**
+ * FHIR CodeSystem.
+ */
+public record Concept(String code, String display, String definition, List<Property> property) {
 
-@Data
-@NoArgsConstructor
-public class Concept {
-  private String code;
-  private String display;
-  private String definition;
-  private List<Property> property = new ArrayList<>();
+  @Override
+  public List<Property> property() {
+    return property == null ? List.of() : property;
+  }
 }

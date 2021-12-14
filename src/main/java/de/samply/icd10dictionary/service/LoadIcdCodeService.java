@@ -2,45 +2,37 @@ package de.samply.icd10dictionary.service;
 
 import de.samply.icd10dictionary.dao.IcdCodeDao;
 import de.samply.icd10dictionary.model.IcdCode;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import org.apache.tomcat.util.buf.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * Data load service.
+ */
 @Service
 public class LoadIcdCodeService {
 
+  private static final Logger logger = LoggerFactory.getLogger(LoadIcdCodeService.class);
+
   private final IcdCodeDao icdCodeDao;
 
-  @Autowired
-  public LoadIcdCodeService(@Qualifier("postgres") IcdCodeDao icdCodeDao) {
+  public LoadIcdCodeService(IcdCodeDao icdCodeDao) {
     this.icdCodeDao = icdCodeDao;
   }
 
   /**
-   * Reads Codesystem (CLAML) from the local filesystem and writes codes to database.
+   * Imports the given CodeSystem into the database.
    *
-   * @param filename the filename of the codesystem
-   * @return ErrorCode
+   * @param codeSystem the CodeSystem
+   * @return {@code DB_NOT_EMPTY} if the database contains already some codes
    */
-  public ErrorCode load(String filename) {
-    if (this.icdCodeDao.count() > 0) {
+  public ErrorCode load(CodeSystem codeSystem) {
+    if (icdCodeDao.count() > 0) {
       return ErrorCode.DB_NOT_EMPTY;
-    }
-
-    Jsonb jsonb = JsonbBuilder.create();
-    CodeSystem codeSystem;
-    try {
-      codeSystem = jsonb.fromJson(new FileInputStream(filename), CodeSystem.class);
-    } catch (FileNotFoundException e) {
-      return ErrorCode.FILE_NOT_FOUND;
     }
 
     createIcdCodes(codeSystem);
@@ -48,50 +40,50 @@ public class LoadIcdCodeService {
   }
 
   private void createIcdCodes(CodeSystem codeSystem) {
-    codeSystem.getConcept().forEach(concept -> this.icdCodeDao.insert(createIcdCode(concept)));
+    codeSystem.concept()
+        .stream().map(LoadIcdCodeService::createIcdCode)
+        .forEach(optionalIcdCode -> {
+          if (optionalIcdCode.isPresent()) {
+            logger.debug("load ICD cod {}", optionalIcdCode.get());
+            icdCodeDao.insert(optionalIcdCode.get());
+          } else {
+            logger.warn("skip non-buildable ICD code");
+          }
+        });
   }
 
-  private IcdCode createIcdCode(Concept concept) {
-    return new IcdCode(
-        concept.getCode(),
-        determineKind(concept),
-        concept.getDefinition(),
-        concept.getDisplay(),
-        determineParentCode(concept),
-        StringUtils.join(determineChildCodes(concept), ','));
+  private static Optional<IcdCode> createIcdCode(Concept concept) {
+    return findProperty(concept, "kind")
+        .map(kind -> new IcdCode(
+            concept.code(),
+            kind,
+            concept.definition(),
+            concept.display(),
+            findProperty(concept, "parent").orElse(null),
+            StringUtils.join(determineChildCodes(concept), ',')));
   }
 
-  private Collection<String> determineChildCodes(Concept concept) {
-    return concept.getProperty().stream()
-        .filter(property -> property.getCode().equals("child"))
-        .map(Property::getValueCode)
+  private static Collection<String> determineChildCodes(Concept concept) {
+    return concept.property().stream()
+        .filter(property -> property.code().equals("child"))
+        .map(Property::valueCode)
         .collect(Collectors.toList());
   }
 
-  private String determineParentCode(Concept concept) {
-    return findProperty(concept, "parent");
+  private static Optional<String> findProperty(Concept concept, String propertyCode) {
+    return concept.property().stream()
+        .filter(property -> property.code().equals(propertyCode))
+        .findFirst()
+        .map(Property::valueCode);
   }
 
-  private String determineKind(Concept concept) {
-    return findProperty(concept, "kind");
-  }
-
-  private String findProperty(Concept concept, String propertyCode) {
-    Optional<Property> parentPropertyMayBe =
-        concept.getProperty().stream()
-            .filter(property -> property.getCode().equals(propertyCode))
-            .findFirst();
-    if (parentPropertyMayBe.isEmpty()) {
-      return null;
-    } else {
-      return parentPropertyMayBe.get().getValueCode();
-    }
-  }
-
+  /**
+   * Error codes.
+   */
   public enum ErrorCode {
     OK,
     FILE_NOT_FOUND,
     DB_NOT_EMPTY,
-    OTHER;
+    OTHER
   }
 }

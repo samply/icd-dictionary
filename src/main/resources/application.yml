@@ -1,6 +1,5 @@
-app:
+spring:
   datasource:
-    jdbc-url: jdbc:postgresql://localhost:5432/icd10?currentSchema=samply
-    username: postgres
-    password: password
-    pool-size: 30
+    url: jdbc:postgresql://localhost:5432/icd10?currentSchema=samply
+    username: icd10
+    password: icd10

@@ -1,12 +1,8 @@
 package de.samply.icd10dictionary.service;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+/**
+ * FHIR CodeSystem.
+ */
+public record Property(String code, String valueString, String valueCode) {
 
-@Data
-@NoArgsConstructor
-public class Property {
-  private String code;
-  private String valueString;
-  private String valueCode;
 }

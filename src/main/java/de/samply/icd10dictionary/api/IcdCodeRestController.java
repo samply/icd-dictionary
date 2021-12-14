@@ -3,11 +3,11 @@ package de.samply.icd10dictionary.api;
 import de.samply.icd10dictionary.model.IcdCode;
 import de.samply.icd10dictionary.model.ValueSet;
 import de.samply.icd10dictionary.model.ValueSetEntry;
+import de.samply.icd10dictionary.model.ValueSetExpansion;
+import de.samply.icd10dictionary.service.CodeSystem;
 import de.samply.icd10dictionary.service.LoadIcdCodeService;
 import de.samply.icd10dictionary.service.SearchIcdCodeService;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * READ API.
+ */
 @RestController
 @CrossOrigin
 public class IcdCodeRestController {
@@ -40,23 +43,20 @@ public class IcdCodeRestController {
   }
 
   /**
-   * Loads ICD-10 catalog from specified location 'clamlFileUri' on server.
+   * Loads ICD-10 catalog from specified {@code codeSystem}.
    *
-   * @param clamlFileUri Location of content file
+   * @param codeSystem the CodeSystem
    * @return ResponseEntity Http status
    */
   @PostMapping("api/v1/icd/load")
-  public ResponseEntity<String> loadFromFile(@RequestBody String clamlFileUri) {
+  public ResponseEntity<String> load(@RequestBody CodeSystem codeSystem) {
     try {
-      LoadIcdCodeService.ErrorCode errorCode = this.loadIcdCodeService.load(clamlFileUri);
+      LoadIcdCodeService.ErrorCode errorCode = this.loadIcdCodeService.load(codeSystem);
       switch (errorCode) {
         case OK:
           break;
-        case FILE_NOT_FOUND:
-          return new ResponseEntity<>("File not found", HttpStatus.BAD_REQUEST);
         case DB_NOT_EMPTY:
           return new ResponseEntity<>("Database not empty", HttpStatus.CONFLICT);
-        case OTHER:
         default:
           return new ResponseEntity<>("Unspecified error", HttpStatus.BAD_REQUEST);
       }
@@ -64,7 +64,7 @@ public class IcdCodeRestController {
       return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    return new ResponseEntity<>("File imported", HttpStatus.OK);
+    return new ResponseEntity<>("Data imported", HttpStatus.OK);
   }
 
   /**
@@ -76,7 +76,7 @@ public class IcdCodeRestController {
    */
   @GetMapping("fhir/ValueSet/$expand")
   public ValueSet expand(@RequestParam String url, @RequestParam String filter) {
-    if (!StringUtils.equalsIgnoreCase(url, URL_ICD_10_GM)) {
+    if (!URL_ICD_10_GM.equalsIgnoreCase(url)) {
       return new ValueSet();
     }
     List<IcdCode> icdCodes = this.searchIcdCodeService.retrieveCodesByQueryText(filter);
@@ -84,19 +84,8 @@ public class IcdCodeRestController {
   }
 
   private ValueSet createValueSet(List<IcdCode> icdCodes) {
-    ValueSet valueSet = new ValueSet();
-    List<ValueSetEntry> entries =
-        icdCodes.stream()
-            .map(
-                icdCode -> {
-                  ValueSetEntry entry = new ValueSetEntry();
-                  entry.setCode(icdCode.getCode());
-                  entry.setDisplay(icdCode.getDisplay());
-                  return entry;
-                })
-            .collect(Collectors.toList());
-    valueSet.getExpansion().setContains(entries);
-
-    return valueSet;
+    return new ValueSet(new ValueSetExpansion(icdCodes.stream()
+        .map(icdCode -> new ValueSetEntry(icdCode.code(), icdCode.display()))
+        .toList()));
   }
 }
