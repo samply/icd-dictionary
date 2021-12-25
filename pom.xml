@@ -99,7 +99,7 @@
         <dependency>
             <groupId>org.eclipse</groupId>
             <artifactId>yasson</artifactId>
-            <version>1.0.0-RC1</version>
+            <version>1.0.10</version>
             <scope>runtime</scope>
         </dependency>
 
