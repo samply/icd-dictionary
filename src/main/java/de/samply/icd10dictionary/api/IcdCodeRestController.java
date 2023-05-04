@@ -53,7 +53,7 @@ public class IcdCodeRestController {
         case OK:
           break;
         case FILE_NOT_FOUND:
-          return new ResponseEntity<>("File not found", HttpStatus.BAD_REQUEST);
+          return new ResponseEntity<>("File not found: " + clamlFileUri, HttpStatus.BAD_REQUEST);
         case DB_NOT_EMPTY:
           return new ResponseEntity<>("Database not empty", HttpStatus.CONFLICT);
         case OTHER:

@@ -82,6 +82,71 @@ docker run --rm -d -e "ICD_DB_HOST=icd-postgres" -p 8080:8080 --network=icd-net 
 
 This project uses lombok. Though it is not neccessary it is recomended to install a suitable lombok plugin for your IDE (e.g. for IntelliJ Idea install https://plugins.jetbrains.com/plugin/6317-lombok).
 
+## Example usage
+
+In this section, you will see how to do the following:
+
+- Generate the dictionary data.
+- Start the icd-dictionary using docker-compose
+- Import the dictionary data into a running icd-dictionary.
+
+### Generate dictionary data
+
+First visit the [BMBF website hosting the data](https://www.dimdi.de/dynamic/de/downloads/).
+
+Scroll down to the choosers. Click on the one labelled "ICD-10-GM" for the German language dictionary, or the one labelled "ICD-10-WHO" for the English language dictionary.
+
+Pick the most recent version.
+
+You will see a list of files to the right of the choosers. Click on the ClaML/XML file.
+
+You will be brought to a new page. Scroll to the bottom, click on the checkbox "Ich habe die Downloadbedingungen gelesen und stimme diesen ausdrücklich zu", then click the button "Senden". Change the name of the ZIP file to "codesystem-icd10.zip" and save it in the folder "ICD10-GM".
+
+Run the following in the command line console:
+
+```
+cd ICD10-GM
+sh fhir-claml.sh codesystem-icd10.zip > codesystem-icd10.json
+```
+It will take a few minutes. When it is ready, you should find a new file in the folder: "codesystem-icd10.json". This file contains the dictionary data that you will need for importing in the next step.
+
+### Start icd-dictionary
+
+If this is not the first time that you have loaded data to the ICD10 chooser, you will need to wipe the database clean:
+
+```
+docker volume rm icd-postgres-data
+```
+
+Now go back up a level in the folder hierarchy and start icd-dictionary:
+
+```
+cd ..
+docker build -t icd-dictionary .
+docker-compose up -d
+```
+
+### Import dictionary data
+
+You will need to execute the following steps. They involve copying the data to the running icd-dictionary container, opening a terminal on the container and uploading the data.
+
+```
+CTR=`docker ps | grep icd-dictionary | awk '{print $1}'`
+
+docker cp ICD10-GM/codesystem-icd10.json $CTR:/var/tmp/icd10/codesystem-icd10.json
+
+docker exec -it $CTR bash
+# You are now in the container
+curl -H 'Content-Type:text/plain' -d '/var/tmp/icd10/codesystem-icd10.json' http://localhost:8080/api/v1/icd/load
+rm /var/tmp/icd10/codesystem-icd10.json
+# The following command is a test to make sure that there is content
+curl 'http://localhost:8080/fhir/ValueSet/$expand?url=http://hl7.org/fhir/sid/icd-10-gm&filter=blut'
+exit
+
+```
+
+Note that you will need to precede the "docker exec" with "winpty" if you are using git bash on Windows.
+
 ## License
 
 Copyright 2020 The Samply Development Community
