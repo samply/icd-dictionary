@@ -53,7 +53,7 @@ java -jar fhir-claml-0.0.1-SNAPSHOT.jar
     -o codesystem-icd10gm-2020.json 
     -id icd10gm2020 
     -url http://hl7.org/fhir/sid/icd-10-gm 
-    -valueset http://hl7.org/fhir/sid/icd-10-gm/vs
+    -valueSet http://hl7.org/fhir/sid/icd-10-gm/vs
 ```
 
 4.) Run the ICD-10 dictionary (as executable jar) and load the data by using the endpoint "/api/v1/icd/load" with the file path to the FHIR .json-file as body - e.g.
